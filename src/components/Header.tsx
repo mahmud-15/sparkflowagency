@@ -16,10 +16,16 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("");
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
+      
+      // Calculate scroll progress
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+      setScrollProgress(progress);
       
       // Scroll spy logic
       const sections = navLinks.map(link => document.getElementById(link.id));
@@ -52,6 +58,14 @@ const Header = () => {
           : "bg-transparent"
       }`}
     >
+      {/* Scroll Progress Bar */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-transparent">
+        <div 
+          className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-150"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
+      
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
