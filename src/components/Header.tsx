@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Zap } from "lucide-react";
 
 const navLinks = [
-  { name: "About", href: "#about" },
-  { name: "Services", href: "#services" },
-  { name: "Team", href: "#team" },
-  { name: "Portfolio", href: "#portfolio" },
-  { name: "Testimonials", href: "#testimonials" },
+  { name: "About", href: "#about", id: "about" },
+  { name: "Services", href: "#services", id: "services" },
+  { name: "Team", href: "#team", id: "team" },
+  { name: "Portfolio", href: "#portfolio", id: "portfolio" },
+  { name: "Testimonials", href: "#testimonials", id: "testimonials" },
 ];
 
 const FIVERR_URL = "https://www.fiverr.com/spark_flow";
@@ -15,12 +15,32 @@ const FIVERR_URL = "https://www.fiverr.com/spark_flow";
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
+      
+      // Scroll spy logic
+      const sections = navLinks.map(link => document.getElementById(link.id));
+      const scrollPosition = window.scrollY + 100; // Offset for header height
+      
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        if (section && section.offsetTop <= scrollPosition) {
+          setActiveSection(navLinks[i].id);
+          return;
+        }
+      }
+      
+      // If at the top (hero section), no nav item is active
+      if (window.scrollY < 100) {
+        setActiveSection("");
+      }
     };
+    
     window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check initial position
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -51,10 +71,18 @@ const Header = () => {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-muted-foreground hover:text-foreground transition-colors duration-200 relative group"
+                className={`transition-colors duration-200 relative group ${
+                  activeSection === link.id 
+                    ? "text-primary font-medium" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 {link.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+                <span 
+                  className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${
+                    activeSection === link.id ? "w-full" : "w-0 group-hover:w-full"
+                  }`} 
+                />
               </a>
             ))}
           </nav>
@@ -93,7 +121,11 @@ const Header = () => {
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-muted-foreground hover:text-foreground transition-colors duration-200 py-2"
+                className={`transition-colors duration-200 py-2 ${
+                  activeSection === link.id 
+                    ? "text-primary font-medium" 
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
               >
                 {link.name}
               </a>
